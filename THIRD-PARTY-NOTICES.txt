@@ -1,0 +1,94 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+CodeBrix.ServiceLocator is a shared abstraction over IoC containers and service
+locators. It is a faithful port of the CommonServiceLocator library (version
+2.0.7) into the CodeBrix.ServiceLocator namespace, intended as a drop-in
+replacement for the CommonServiceLocator NuGet package.
+
+CodeBrix.ServiceLocator DOES incorporate third-party source code: its types are
+ported from CommonServiceLocator, which is distributed under the Microsoft
+Public License (MS-PL). MS-PL is the same license this project is distributed
+under (see the LICENSE file at the repository root), so the licenses are
+compatible. The upstream copyright/attribution notice and the full MS-PL license
+text are reproduced below, as MS-PL sections 3(C) and 3(D) require.
+
+================================================================================
+1. CommonServiceLocator
+================================================================================
+
+Project:    CommonServiceLocator
+Source:     https://github.com/unitycontainer/commonservicelocator
+Version:    2.0.7
+Authors:    .NET Foundation and Contributors
+Copyright:  Copyright (c) .NET Foundation and Contributors. All Rights Reserved.
+License:    MS-PL (Microsoft Public License)
+
+Scope of incorporation:
+  The CommonServiceLocator 2.0.7 production source was ported into this
+  repository under src/CodeBrix.ServiceLocator/. The ported types are:
+    - IServiceLocator          (the service-location abstraction)
+    - ServiceLocator           (the static ambient-container accessor)
+    - ServiceLocatorImplBase   (the abstract default IServiceLocator base)
+    - ServiceLocatorProvider   (the ambient-container provider delegate)
+    - ActivationException      (the resolution-failure exception)
+
+Modifications made during the port (per CodeBrix family conventions):
+  - Namespace rename: the upstream `CommonServiceLocator` namespace became
+    `CodeBrix.ServiceLocator`; each ported file's namespace line carries a
+    `//was previously: CommonServiceLocator;` provenance comment. The namespace
+    is kept FLAT (no sub-namespaces) so the type-for-type public surface matches
+    the original, preserving drop-in compatibility.
+  - Block-scoped namespaces were converted to file-scoped namespaces.
+  - The library targets net10.0 only (upstream multi-targeted a dozen
+    frameworks from net40 / netstandard1.0 through net7.0).
+  - Strong-name signing was dropped. Upstream's src/Properties/AssemblyInfo.cs
+    (carrying [assembly: CLSCompliant] / [assembly: SecurityTransparent]) and
+    the package.snk strong-name key were NOT ported; this repository uses the
+    CodeBrix-standard src/CodeBrix.ServiceLocator/InternalsVisibleTo.cs.
+  - The net40-only shim src/net40/TypeInfo.cs was NOT ported (its modern BCL
+    equivalents are intrinsic to net10).
+  - The net40-only file src/Exceptions/ActivationException.Desktop.cs (the
+    [Serializable] partial adding the SerializationInfo/StreamingContext
+    constructor) was NOT ported. The upstream csproj compiles that file only for
+    the net40 target; on net10 it is excluded, and porting it would surface the
+    obsolete legacy-binary-serialization diagnostics (SYSLIB0051). The ported
+    ActivationException therefore matches the modern-framework upstream build.
+
+License text (CommonServiceLocator, MS-PL):
+
+Microsoft Public License (MS-PL)
+This license governs use of the accompanying software. If you use the software, you
+accept this license. If you do not accept the license, do not use the software.
+
+1. Definitions
+The terms "reproduce," "reproduction," "derivative works," and "distribution" have the
+same meaning here as under U.S. copyright law.
+A "contribution" is the original software, or any additions or changes to the software.
+A "contributor" is any person that distributes its contribution under this license.
+"Licensed patents" are a contributor's patent claims that read directly on its contribution.
+
+2. Grant of Rights
+(A) Copyright Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
+(B) Patent Grant- Subject to the terms of this license, including the license conditions and limitations in section 3, each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
+
+3. Conditions and Limitations
+(A) No Trademark License- This license does not grant you rights to use any contributors' name, logo, or trademarks.
+(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, your patent license from such contributor to the software ends automatically.
+(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution notices that are present in the software.
+(D) If you distribute any portion of the software in source code form, you may do so only under this license by including a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object code form, you may only do so under a license that complies with this license.
+(E) The software is licensed "as-is." You bear the risk of using it. The contributors give no express warranties, guarantees or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular purpose and non-infringement.
+
+================================================================================
+
+Jeremy Ellis and contributors license the CodeBrix.ServiceLocator project to you
+under the terms set forth in the LICENSE file, which is located at the root of
+this repository.
+
+If you have any questions about any third-party code referenced here, or if you
+believe that any third-party code has been included in CodeBrix.ServiceLocator
+in error, please open a new issue at:
+https://github.com/ellisnet/CodeBrix.ServiceLocator/issues
+
+================================================================================
+
+END OF THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
