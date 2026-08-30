@@ -1,9 +1,14 @@
 # CodeBrix.ServiceLocator
 
-A fully managed service-location abstraction library for .NET — a faithful port of [CommonServiceLocator](https://github.com/unitycontainer/commonservicelocator) 2.0.7 into the `CodeBrix.ServiceLocator` namespace, intended as a drop-in replacement for the `CommonServiceLocator` NuGet package. It provides a shared interface over IoC containers and service locators, so an application can resolve services indirectly without taking a hard reference on any specific container.
-CodeBrix.ServiceLocator has no dependencies other than .NET, and is provided as a .NET 10 library and associated `CodeBrix.ServiceLocator.MsplLicenseForever` NuGet package.
+A fully managed service-location abstraction library for .NET — a faithful port of [CommonServiceLocator](https://github.com/unitycontainer/commonservicelocator) 2.0.7 into the `CodeBrix.ServiceLocation` namespace, intended as a drop-in replacement for the `CommonServiceLocator` NuGet package. It provides a shared interface over IoC containers and service locators, so an application can resolve services indirectly without taking a hard reference on any specific container.
 
-CodeBrix.ServiceLocator supports applications and assemblies that target Microsoft .NET version 10.0 and later.
+> **Breaking change — the namespace is `CodeBrix.ServiceLocation`.**
+> Package versions through `1.0.242.982` used `CodeBrix.ServiceLocator`; every later version uses `CodeBrix.ServiceLocation`. Write `using CodeBrix.ServiceLocation;`. Nothing else changed — same types, same members, same behavior, same package id and assembly name.
+> The old namespace was a member of the enclosing `CodeBrix` namespace, so in any consumer whose own namespace began with `CodeBrix.` the bare name `ServiceLocator` bound to the *namespace* and hid the *class*, failing with CS0234. Because versions here are date-stamped (major pinned to `1`), this break cannot show up as a major-version bump — expect a compile error instead.
+
+CodeBrix.ServiceLocator has no dependencies other than .NET, and is provided as a .NET Standard 2.0 / .NET 10 library and associated `CodeBrix.ServiceLocator.MsplLicenseForever` NuGet package.
+
+CodeBrix.ServiceLocator supports applications and assemblies that target Microsoft .NET version 10.0 and later, and — via its .NET Standard 2.0 target — downlevel consumers such as Roslyn source generators and analyzers.
 Microsoft .NET version 10.0 is a Long-Term Supported (LTS) version of .NET, and was released on Nov 11, 2025; and will be actively supported by Microsoft until Nov 14, 2028.
 Please update your C#/.NET code and projects to the latest LTS version of Microsoft .NET.
 
@@ -15,7 +20,7 @@ Please update your C#/.NET code and projects to the latest LTS version of Micros
 * **`ActivationException`** — the standard exception raised when service resolution fails (resolution errors thrown by the underlying container are wrapped in it).
 * **`ServiceLocatorProvider`** — the delegate used to supply the ambient container to `ServiceLocator`.
 
-The public type-for-type surface matches CommonServiceLocator 2.0.7, so migrating is largely a namespace change from `CommonServiceLocator` to `CodeBrix.ServiceLocator`.
+The public type-for-type surface matches CommonServiceLocator 2.0.7, so migrating is largely a namespace change from `CommonServiceLocator` to `CodeBrix.ServiceLocation`.
 
 ## Sample Code
 
@@ -24,7 +29,7 @@ The public type-for-type surface matches CommonServiceLocator 2.0.7, so migratin
 ```csharp
 using System;
 using System.Collections.Generic;
-using CodeBrix.ServiceLocator;
+using CodeBrix.ServiceLocation;
 
 // 1. Adapt your IoC container by deriving from ServiceLocatorImplBase.
 public sealed class MyContainerAdapter : ServiceLocatorImplBase

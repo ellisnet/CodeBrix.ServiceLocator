@@ -2,7 +2,7 @@ THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 
 CodeBrix.ServiceLocator is a shared abstraction over IoC containers and service
 locators. It is a faithful port of the CommonServiceLocator library (version
-2.0.7) into the CodeBrix.ServiceLocator namespace, intended as a drop-in
+2.0.7) into the CodeBrix.ServiceLocation namespace, intended as a drop-in
 replacement for the CommonServiceLocator NuGet package.
 
 CodeBrix.ServiceLocator DOES incorporate third-party source code: its types are
@@ -34,13 +34,17 @@ Scope of incorporation:
 
 Modifications made during the port (per CodeBrix family conventions):
   - Namespace rename: the upstream `CommonServiceLocator` namespace became
-    `CodeBrix.ServiceLocator`; each ported file's namespace line carries a
+    `CodeBrix.ServiceLocation`; each ported file's namespace line carries a
     `//was previously: CommonServiceLocator;` provenance comment. The namespace
     is kept FLAT (no sub-namespaces) so the type-for-type public surface matches
-    the original, preserving drop-in compatibility.
+    the original, preserving drop-in compatibility. Package versions through
+    1.0.242.982 used `CodeBrix.ServiceLocator` for this namespace; it was
+    renamed because a namespace of that name hid the ported `ServiceLocator`
+    class from consumers in other `CodeBrix.*` namespaces. Only the namespace
+    changed; no ported type, member or behavior was altered.
   - Block-scoped namespaces were converted to file-scoped namespaces.
-  - The library targets net10.0 only (upstream multi-targeted a dozen
-    frameworks from net40 / netstandard1.0 through net7.0).
+  - The library targets netstandard2.0 and net10.0 (upstream multi-targeted a
+    dozen frameworks from net40 / netstandard1.0 through net7.0).
   - Strong-name signing was dropped. Upstream's src/Properties/AssemblyInfo.cs
     (carrying [assembly: CLSCompliant] / [assembly: SecurityTransparent]) and
     the package.snk strong-name key were NOT ported; this repository uses the

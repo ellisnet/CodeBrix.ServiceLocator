@@ -1,9 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
+    <!-- netstandard2.0 defaults to C# 7.3; the sources use file-scoped namespaces and
+         string interpolation, so pin a modern language version for all TFMs. -->
+    <LangVersion>latest</LangVersion>
     <AssemblyName>CodeBrix.ServiceLocator</AssemblyName>
-    <RootNamespace>CodeBrix.ServiceLocator</RootNamespace>
+    <!-- Namespace is CodeBrix.ServiceLocation, NOT CodeBrix.ServiceLocator: a
+         namespace of the latter name would be a member of the enclosing CodeBrix
+         namespace and would hide the ServiceLocator CLASS from every CodeBrix.*
+         consumer (CS0234). AssemblyName and PackageId intentionally keep the
+         ServiceLocator spelling. See AGENT-README.txt. -->
+    <RootNamespace>CodeBrix.ServiceLocation</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -53,7 +61,7 @@
     <Product>CodeBrix.ServiceLocator</Product>
     <Title>CodeBrix.ServiceLocator</Title>
     <Authors>Jeremy Ellis</Authors>
-    <Description>CodeBrix.ServiceLocator is a drop-in replacement for the CommonServiceLocator 2.0.7 NuGet package, ported into the CodeBrix.ServiceLocator namespace. It provides a shared abstraction over IoC containers and service locators, allowing an application to indirectly access service-location capabilities without relying on hard references to a specific container.</Description>
+    <Description>CodeBrix.ServiceLocator is a drop-in replacement for the CommonServiceLocator 2.0.7 NuGet package, ported into the CodeBrix.ServiceLocation namespace. It provides a shared abstraction over IoC containers and service locators, allowing an application to indirectly access service-location capabilities without relying on hard references to a specific container.</Description>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ellisnet/CodeBrix.ServiceLocator</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ellisnet/CodeBrix.ServiceLocator</RepositoryUrl>

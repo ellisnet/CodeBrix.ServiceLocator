@@ -5,6 +5,63 @@ CodeBrix.ServiceLocator.MsplLicenseForever NuGet package
 ================================================================================
 
 
+********************************************************************************
+**                                                                            **
+**   BREAKING CHANGE -- THE NAMESPACE IS NOW  CodeBrix.ServiceLocation        **
+**                                                                            **
+********************************************************************************
+
+  READ THIS BEFORE WRITING ANY `using` FOR THIS PACKAGE.
+
+  The namespace changed from `CodeBrix.ServiceLocator` to
+  `CodeBrix.ServiceLocation`. Versions through 1.0.242.982 used the OLD name;
+  every later version uses the NEW one.
+
+      using CodeBrix.ServiceLocation;     // CORRECT -- current package
+      using CodeBrix.ServiceLocation;      // WRONG   -- will not compile
+
+  NOTHING ELSE CHANGED. Same five public types, same members, same behavior,
+  same PackageId, same assembly name. Upgrading is a one-line find/replace of
+  the `using` directive in each file that has one.
+
+  WHY IT CHANGED. The old namespace collided with its own main class for a
+  whole category of consumers. `CodeBrix.ServiceLocator` was a NAMESPACE and
+  therefore a member of the enclosing `CodeBrix` namespace, so in any code
+  whose own namespace began with `CodeBrix.` the bare name `ServiceLocator`
+  bound to the namespace and hid the CLASS of the same name:
+
+      namespace CodeBrix.MyApp
+      {
+          // error CS0234: the type or namespace name 'Current' does not
+          // exist in the namespace 'CodeBrix.ServiceLocator'
+          var c = ServiceLocator.Current;
+      }
+
+  That broke the package's core promise of being a drop-in replacement for
+  CommonServiceLocator, and it could not be worked around cleanly: a
+  using-alias at the top of the file does NOT help, because an
+  enclosing-namespace member outranks a compilation-unit using-alias. Every
+  CodeBrix-family consumer would have needed an alias declared inside its
+  namespace body. Renaming the namespace fixes it once, for everyone.
+
+  `CodeBrix.ServiceLocation` is not a member-name match for any public type,
+  so `using CodeBrix.ServiceLocation;` followed by `ServiceLocator.Current`
+  now resolves correctly from ANY namespace, CodeBrix.* included.
+
+  VERSIONING CANNOT WARN YOU. This repository uses date-stamped versions
+  (1.<years>.<day-of-year>.<minute-of-day>) where the major is pinned to 1, so
+  major/minor do NOT signal API compatibility and this break does NOT appear
+  as a major-version bump. Pin deliberately, and expect a compile error rather
+  than a version warning if you upgrade across the boundary.
+
+  DO NOT "FIX" THIS BY RENAMING THE NAMESPACE BACK. The test project contains
+  tests/CodeBrix.ServiceLocator.Tests/NamespaceCollisionGuardTests.cs, which
+  lives in an unrelated CodeBrix.* namespace specifically so that reintroducing
+  the collision fails the build.
+
+********************************************************************************
+
+
 OVERVIEW
 ========
 
@@ -25,17 +82,25 @@ Five public types make up the whole surface:
   ServiceLocatorProvider   delegate that supplies the ambient container
   ActivationException      the resolution-failure exception
 
-Target framework: .NET 10 or later. The library is fully managed, has no NuGet
-dependencies, and the assembly is marked [CLSCompliant(true)].
+Target frameworks: netstandard2.0 and net10.0. The library is fully managed,
+has no NuGet dependencies, and the assembly is marked [CLSCompliant(true)].
+The netstandard2.0 target exists so downlevel and Roslyn source-generator /
+analyzer projects can consume the abstraction; it was added after 1.0.242.982,
+which shipped net10.0-only.
 
 Provenance: this is a faithful port of CommonServiceLocator 2.0.7 into the
-`CodeBrix.ServiceLocator` namespace, intended as a drop-in replacement for the
+`CodeBrix.ServiceLocation` namespace, intended as a drop-in replacement for the
 CommonServiceLocator NuGet package. The public surface is type-for-type
 identical and the namespace is deliberately flat, so migration is a namespace
 change. Do NOT write `using CommonServiceLocator;` in code that consumes this
 package, and do not reference the upstream package alongside it — the type names
 are the same in both, so having both in scope produces ambiguous-reference
 compiler errors.
+
+The namespace is `CodeBrix.ServiceLocation` and NOT `CodeBrix.ServiceLocator`,
+deliberately: a namespace of the latter name would hide the `ServiceLocator`
+class from every `CodeBrix.*` consumer. See the breaking-change notice at the
+top of this file.
 
 
 INSTALLATION
@@ -52,23 +117,29 @@ License: MS-PL. The package is published under the SPDX expression MS-PL; the
 upstream CommonServiceLocator attribution is reproduced in the packaged
 THIRD-PARTY-NOTICES.txt.
 
-Requirements: none beyond .NET 10. No native libraries, no platform-specific
-code, no OS restrictions — the package runs anywhere .NET 10 runs, including
-trimmed and AOT-published applications (nothing in it uses reflection; the
-types your adapter resolves may, but that is your container's concern).
+Requirements: .NET 10, or any framework compatible with netstandard2.0. No
+native libraries, no platform-specific code, no OS restrictions — the package
+runs anywhere those run, including trimmed and AOT-published applications
+(nothing in it uses reflection; the types your adapter resolves may, but that
+is your container's concern).
 
-Assembly name and root namespace: `CodeBrix.ServiceLocator`. The
-`.MsplLicenseForever` suffix exists only on the NuGet PackageId, for license
+Assembly name: `CodeBrix.ServiceLocator`. Namespace: `CodeBrix.ServiceLocation`.
+These deliberately DIFFER — the assembly, the repository and the PackageId keep
+the "ServiceLocator" spelling, while the namespace uses "ServiceLocation" to
+avoid hiding the `ServiceLocator` class from `CodeBrix.*` consumers. You write
+the NAMESPACE in `using` directives, so it is `using CodeBrix.ServiceLocation;`.
+The `.MsplLicenseForever` suffix exists only on the NuGet PackageId, for license
 disambiguation across the CodeBrix family; it never appears in code.
 
 
 KEY NAMESPACES / USINGS
 =======================
 
-    using CodeBrix.ServiceLocator;
+    using CodeBrix.ServiceLocation;
 
 That single namespace holds every public type. There are no sub-namespaces —
-the flat layout is what preserves type-for-type drop-in compatibility.
+the flat layout is what preserves type-for-type drop-in compatibility. Note the
+spelling: ServiceLocatION for the namespace, ServiceLocatOR for the class.
 
 A container adapter normally also needs:
 
@@ -79,7 +150,7 @@ Common combination in an adapter file:
 
     using System;
     using System.Collections.Generic;
-    using CodeBrix.ServiceLocator;
+    using CodeBrix.ServiceLocation;
 
 
 CORE API REFERENCE
@@ -248,7 +319,7 @@ shape does not change.
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using CodeBrix.ServiceLocator;
+    using CodeBrix.ServiceLocation;
 
     namespace MyApp.Composition;
 
@@ -296,7 +367,7 @@ Example 2 — publishing the adapter as the ambient container
 Build the adapter ONCE at startup and hand the same instance out, because the
 provider delegate runs on every ServiceLocator.Current access.
 
-    using CodeBrix.ServiceLocator;
+    using CodeBrix.ServiceLocation;
 
     namespace MyApp.Composition;
 
@@ -328,7 +399,7 @@ Example 3 — consumer-side resolution
 
     using System;
     using System.Collections.Generic;
-    using CodeBrix.ServiceLocator;
+    using CodeBrix.ServiceLocation;
 
     public sealed class ReportService
     {
@@ -361,7 +432,7 @@ Example 4 — defensive resolution and failure handling
 -----------------------------------------------------
 
     using System;
-    using CodeBrix.ServiceLocator;
+    using CodeBrix.ServiceLocation;
 
     public static class Resolver
     {
@@ -396,7 +467,7 @@ while trying to get instance of type X, key "y"" is not enough.
 
     using System;
     using System.Collections.Generic;
-    using CodeBrix.ServiceLocator;
+    using CodeBrix.ServiceLocation;
 
     public sealed class DiagnosticLocator : ServiceLocatorImplBase
     {
@@ -446,7 +517,7 @@ Program.cs
 
     using System;
     using System.Collections.Generic;
-    using CodeBrix.ServiceLocator;
+    using CodeBrix.ServiceLocation;
 
     namespace MyApp;
 
@@ -596,7 +667,7 @@ COMMON PITFALLS TO AVOID
  12. Do not reference the upstream CommonServiceLocator package alongside this
      one: identical type names in two namespaces produce ambiguous references.
      Migrating means replacing `using CommonServiceLocator;` with
-     `using CodeBrix.ServiceLocator;` — nothing else changes.
+     `using CodeBrix.ServiceLocation;` — nothing else changes.
 
  13. ServiceLocator.Current can legitimately return null if the registered
      provider delegate returns null; the accessor does not check. A provider
@@ -625,8 +696,17 @@ WHAT THIS PACKAGE DOES NOT DO
   * ActivationException has no [Serializable] SerializationInfo/StreamingContext
     constructor; the upstream net40-only constructor is deliberately not ported
     (it would trip SYSLIB0051 on modern .NET).
-  * The assembly is not strong-name signed, and targets net10.0 only — no
-    netstandard2.0 or older-framework build exists.
+  * The assembly is not strong-name signed. It targets netstandard2.0 and
+    net10.0; no older-framework-specific build exists.
+  * The namespace is `CodeBrix.ServiceLocation`, not `CodeBrix.ServiceLocator`.
+    Getting this wrong is the single most likely thing to go wrong when you
+    consume this package, especially if you are working from an older sample,
+    from package version 1.0.242.982 or earlier, or from memory. If you write
+    `using CodeBrix.ServiceLocation;` you get CS0246 (namespace not found); if
+    you are inside a `CodeBrix.*` namespace and rely on an old alias you may
+    instead see CS0234 or CS0118 naming a namespace where you expected a type.
+    Both mean the same thing: use `using CodeBrix.ServiceLocation;`. See the
+    breaking-change notice at the top of this file.
 
 
 WORKING EXAMPLES ON GITHUB
@@ -665,8 +745,9 @@ QUICK REFERENCE CARD
 
 PACKAGE
   Id          CodeBrix.ServiceLocator.MsplLicenseForever
-  Namespace   CodeBrix.ServiceLocator          (flat; no license suffix)
-  License     MS-PL          TFM  net10.0 or later          Dependencies  none
+  Namespace   CodeBrix.ServiceLocation         (flat; NOT "...ServiceLocator")
+  Assembly    CodeBrix.ServiceLocator          (differs from the namespace)
+  License     MS-PL   TFMs  netstandard2.0; net10.0   Dependencies  none
 
 SET UP (once, at startup)
   ServiceLocator.SetLocatorProvider(() => _locator);   // cached instance

@@ -1,9 +1,9 @@
 using System;
-using CodeBrix.ServiceLocator;
+using CodeBrix.ServiceLocation;
 using SilverAssertions;
 using Xunit;
 
-namespace CodeBrix.ServiceLocator.Tests;
+namespace CodeBrix.ServiceLocation.Tests;
 
 // All tests for the static ambient `ServiceLocator` accessor live in this single
 // class. xUnit runs the methods of one test class sequentially, so each test sets

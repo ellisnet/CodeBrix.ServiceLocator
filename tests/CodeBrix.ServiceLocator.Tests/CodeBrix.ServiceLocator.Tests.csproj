@@ -2,6 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- Must be set explicitly. RootNamespace otherwise defaults to the project
+         name (CodeBrix.ServiceLocator.Tests), and xUnit v3 emits its generated
+         obj/**/SelfRegisteredExtensions.cs into that namespace, which would
+         re-create a `CodeBrix.ServiceLocator` namespace inside this assembly and
+         reintroduce the very collision NamespaceCollisionGuardTests.cs guards
+         against. The AssemblyName stays CodeBrix.ServiceLocator.Tests to match
+         the InternalsVisibleTo grant. -->
+    <RootNamespace>CodeBrix.ServiceLocation.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 using System;
 
-namespace CodeBrix.ServiceLocator; //was previously: CommonServiceLocator;
+namespace CodeBrix.ServiceLocation; //was previously: CommonServiceLocator; (was CodeBrix.ServiceLocator through v1.0.242.982)
 
 /// <summary>
 /// This class provides the ambient container for this application. If your

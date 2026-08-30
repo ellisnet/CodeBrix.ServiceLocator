@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CodeBrix.ServiceLocator; //was previously: CommonServiceLocator;
+namespace CodeBrix.ServiceLocation; //was previously: CommonServiceLocator; (was CodeBrix.ServiceLocator through v1.0.242.982)
 
 /// <summary>
 /// The generic Service Locator interface. This interface is used

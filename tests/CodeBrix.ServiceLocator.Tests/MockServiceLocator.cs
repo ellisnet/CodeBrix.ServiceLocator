@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CodeBrix.ServiceLocator;
+using CodeBrix.ServiceLocation;
 
-namespace CodeBrix.ServiceLocator.Tests;
+namespace CodeBrix.ServiceLocation.Tests;
 
 // Test infrastructure (helper file -- intentionally no "Tests" suffix).
 

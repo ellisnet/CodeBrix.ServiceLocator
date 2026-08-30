@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CodeBrix.ServiceLocator;
+using CodeBrix.ServiceLocation;
 using SilverAssertions;
 using Xunit;
 
-namespace CodeBrix.ServiceLocator.Tests;
+namespace CodeBrix.ServiceLocation.Tests;
 
 public class ServiceLocatorImplBaseTests
 {

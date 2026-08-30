@@ -122,9 +122,11 @@ PACKAGING AND PUBLISHING
     major/minor say nothing about API compatibility. Two builds within the same
     UTC minute produce the same version — never publish two packages from
     inside one minute. Re-baseline by changing _VersionBaseYear.
-  * PackageId is CodeBrix.ServiceLocator.MsplLicenseForever while the
-    AssemblyName and RootNamespace are plain CodeBrix.ServiceLocator; the
-    license suffix exists only on the PackageId.
+  * PackageId is CodeBrix.ServiceLocator.MsplLicenseForever and AssemblyName is
+    CodeBrix.ServiceLocator, but RootNamespace is CodeBrix.ServiceLocatION. The
+    license suffix exists only on the PackageId. The namespace/assembly mismatch
+    is DELIBERATE and must not be "tidied up" — see the namespace-rename note
+    under Port modifications below.
   * <PackageLicenseExpression>MS-PL</PackageLicenseExpression>, icon
     icon-codebrix-128.png, readme README.md,
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>.
@@ -149,11 +151,36 @@ THIRD-PARTY-NOTICES.txt as MS-PL sections 3(C) and 3(D) require.
 
 Port modifications (all recorded in THIRD-PARTY-NOTICES.txt):
 
-  * Namespace rename CommonServiceLocator -> CodeBrix.ServiceLocator. Every
+  * Namespace rename CommonServiceLocator -> CodeBrix.ServiceLocation. Every
     ported file's namespace line carries a `//was previously:
     CommonServiceLocator;` provenance comment — keep those comments.
+  * THE NAMESPACE IS `CodeBrix.ServiceLocation`, NOT `CodeBrix.ServiceLocator`,
+    AND MUST STAY THAT WAY. Package versions through 1.0.242.982 used
+    `CodeBrix.ServiceLocator`, which was a NAMESPACE and therefore a member of
+    the enclosing `CodeBrix` namespace. From any other `CodeBrix.*` namespace
+    the bare name `ServiceLocator` then bound to that namespace and hid the
+    CLASS of the same name, so `ServiceLocator.Current` failed with CS0234.
+    A using-alias at the top of a consumer's file does NOT fix that (an
+    enclosing-namespace member outranks a compilation-unit using-alias), so
+    every CodeBrix-family consumer would have needed an alias inside its
+    namespace body. Renaming the namespace fixed it once, for all consumers.
+    tests/CodeBrix.ServiceLocator.Tests/NamespaceCollisionGuardTests.cs lives in
+    an unrelated `CodeBrix.*` namespace and STOPS COMPILING if the collision is
+    reintroduced; that build break is intentional, do not paper over it with an
+    alias. Note also that the test project sets <RootNamespace> explicitly: left
+    at its default it would be CodeBrix.ServiceLocator.Tests, and xUnit v3's
+    generated obj/**/SelfRegisteredExtensions.cs would re-create a
+    `CodeBrix.ServiceLocator` namespace inside the test assembly.
+    This rename is a BREAKING CHANGE for consumers and the date-stamped version
+    scheme cannot signal it (major is pinned to 1); it is announced loudly at the
+    top of AGENT-README.txt.
   * Block-scoped namespaces converted to file-scoped.
-  * net10.0 only; upstream multi-targeted a dozen frameworks.
+  * Targets netstandard2.0 and net10.0; upstream multi-targeted a dozen
+    frameworks. netstandard2.0 was added so CodeBrix.Platform.Extensions —
+    which multi-targets netstandard2.0 for Roslyn source generators — could
+    take this package in place of CommonServiceLocator. LangVersion is pinned
+    to `latest` because netstandard2.0 would otherwise default to C# 7.3 and
+    the sources use file-scoped namespaces.
   * Strong-name signing dropped: upstream src/Properties/AssemblyInfo.cs and
     package.snk were not ported. The [assembly: CLSCompliant(true)] attribute
     they carried lives in InternalsVisibleTo.cs instead (it is required, because
@@ -181,7 +208,8 @@ Standard CodeBrix family conventions apply, with no situational exceptions:
     null-forgiveness operator. Value-type nullables are fine.
   * File-scoped namespaces only.
   * No `global using` directives; usings are explicit and per-file.
-  * net10.0 only; no multi-targeting.
+  * netstandard2.0 and net10.0 only; do not add further target frameworks.
+    Nothing in the library may use an API outside the netstandard2.0 surface.
   * <GenerateDocumentationFile> on; CS1591 fixed at source.
   * No project-level warning suppression (<NoWarn>, <WarningLevel>0</...>,
     <TreatWarningsAsErrors>false</...> are all forbidden).
