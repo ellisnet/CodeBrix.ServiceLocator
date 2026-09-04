@@ -14,11 +14,11 @@ CodeBrix.ServiceLocator.MsplLicenseForever NuGet package
   READ THIS BEFORE WRITING ANY `using` FOR THIS PACKAGE.
 
   The namespace changed from `CodeBrix.ServiceLocator` to
-  `CodeBrix.ServiceLocation`. Versions through 1.0.242.982 used the OLD name;
-  every later version uses the NEW one.
+  `CodeBrix.ServiceLocation`. Earlier versions of the package used the OLD
+  name; the current package uses the NEW one.
 
       using CodeBrix.ServiceLocation;     // CORRECT -- current package
-      using CodeBrix.ServiceLocation;      // WRONG   -- will not compile
+      using CodeBrix.ServiceLocator;      // WRONG   -- old name, will not compile
 
   NOTHING ELSE CHANGED. Same five public types, same members, same behavior,
   same PackageId, same assembly name. Upgrading is a one-line find/replace of
@@ -85,10 +85,9 @@ Five public types make up the whole surface:
 Target frameworks: netstandard2.0 and net10.0. The library is fully managed,
 has no NuGet dependencies, and the assembly is marked [CLSCompliant(true)].
 The netstandard2.0 target exists so downlevel and Roslyn source-generator /
-analyzer projects can consume the abstraction; it was added after 1.0.242.982,
-which shipped net10.0-only.
+analyzer projects can consume the abstraction.
 
-Provenance: this is a faithful port of CommonServiceLocator 2.0.7 into the
+Provenance: this is a faithful port of CommonServiceLocator into the
 `CodeBrix.ServiceLocation` namespace, intended as a drop-in replacement for the
 CommonServiceLocator NuGet package. The public surface is type-for-type
 identical and the namespace is deliberately flat, so migration is a namespace
@@ -700,13 +699,13 @@ WHAT THIS PACKAGE DOES NOT DO
     net10.0; no older-framework-specific build exists.
   * The namespace is `CodeBrix.ServiceLocation`, not `CodeBrix.ServiceLocator`.
     Getting this wrong is the single most likely thing to go wrong when you
-    consume this package, especially if you are working from an older sample,
-    from package version 1.0.242.982 or earlier, or from memory. If you write
-    `using CodeBrix.ServiceLocation;` you get CS0246 (namespace not found); if
-    you are inside a `CodeBrix.*` namespace and rely on an old alias you may
-    instead see CS0234 or CS0118 naming a namespace where you expected a type.
-    Both mean the same thing: use `using CodeBrix.ServiceLocation;`. See the
-    breaking-change notice at the top of this file.
+    consume this package, especially if you are working from an older sample or
+    from memory. If you write `using CodeBrix.ServiceLocator;` -- the old name
+    -- you get CS0246 (namespace not found); if you are inside a `CodeBrix.*`
+    namespace and rely on an old alias you may instead see CS0234 or CS0118
+    naming a namespace where you expected a type. Both mean the same thing: use
+    `using CodeBrix.ServiceLocation;`. See the breaking-change notice at the top
+    of this file.
 
 
 WORKING EXAMPLES ON GITHUB
@@ -738,6 +737,14 @@ The test project is the executable specification for everything above:
   ActivationExceptionTests.cs
       The three constructors and the inner-exception behaviour.
       https://github.com/ellisnet/CodeBrix.ServiceLocator/blob/main/tests/CodeBrix.ServiceLocator.Tests/ActivationExceptionTests.cs
+
+  NamespaceCollisionGuardTests.cs
+      A compile-time regression guard rather than a behaviour test: it lives in
+      an unrelated `CodeBrix.*` namespace (CodeBrix.CollisionGuard.Tests) and
+      stops compiling if the old namespace name is ever reintroduced. It is the
+      standing proof that `using CodeBrix.ServiceLocation;` followed by
+      `ServiceLocator.Current` resolves from a CodeBrix.* consumer.
+      https://github.com/ellisnet/CodeBrix.ServiceLocator/blob/main/tests/CodeBrix.ServiceLocator.Tests/NamespaceCollisionGuardTests.cs
 
 
 QUICK REFERENCE CARD

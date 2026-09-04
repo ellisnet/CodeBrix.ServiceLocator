@@ -13,7 +13,9 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
       CodeBrix.ServiceLocator.MsplLicenseForever — a shared abstraction over IoC
       containers and service locators (IServiceLocator, ServiceLocatorImplBase,
       the static ServiceLocator ambient accessor, ServiceLocatorProvider and
-      ActivationException); a drop-in replacement for CommonServiceLocator.
+      ActivationException). Note that the namespace you import is
+      `CodeBrix.ServiceLocation`, not the PackageId spelling — write
+      `using CodeBrix.ServiceLocation;`.
 
 MAINTAINER AND EXTRAS
 ---------------------
@@ -29,3 +31,5 @@ GENERAL
       Human-facing overview shown on GitHub and nuget.org.
   README-INDEX.txt
       This file.
+  THIRD-PARTY-NOTICES.txt
+      What came from where, and under which licences.

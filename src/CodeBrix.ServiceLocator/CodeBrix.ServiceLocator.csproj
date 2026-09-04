@@ -61,7 +61,7 @@
     <Product>CodeBrix.ServiceLocator</Product>
     <Title>CodeBrix.ServiceLocator</Title>
     <Authors>Jeremy Ellis</Authors>
-    <Description>CodeBrix.ServiceLocator is a drop-in replacement for the CommonServiceLocator 2.0.7 NuGet package, ported into the CodeBrix.ServiceLocation namespace. It provides a shared abstraction over IoC containers and service locators, allowing an application to indirectly access service-location capabilities without relying on hard references to a specific container.</Description>
+    <Description>CodeBrix.ServiceLocator provides a shared abstraction over IoC containers and service locators, allowing an application to indirectly access service-location capabilities without relying on hard references to a specific container. Note that the package id and assembly keep the ServiceLocator spelling while the namespace to import is CodeBrix.ServiceLocation.</Description>
     <PackageLicenseExpression>MS-PL</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ellisnet/CodeBrix.ServiceLocator</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ellisnet/CodeBrix.ServiceLocator</RepositoryUrl>
@@ -72,7 +72,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <IsPackable>true</IsPackable>
-    <PackageTags>service-locator;ioc;dependency-injection;commonservicelocator;abstraction;container;CodeBrix</PackageTags>
+    <PackageTags>service-locator;service-location;ioc;dependency-injection;abstraction;container;CodeBrix</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

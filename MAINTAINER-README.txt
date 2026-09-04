@@ -28,8 +28,19 @@ REPOSITORY LAYOUT
 =================
 
   CodeBrix.ServiceLocator/
-    CodeBrix.ServiceLocator.slnx        solution (Solution Items folder +
-                                        Tests folder + the library project)
+    CodeBrix.ServiceLocator.slnx        solution. The Solution Items folder
+                                        carries .gitignore, AGENT-README.txt,
+                                        EXTRAS-README.txt, global.json,
+                                        icon-codebrix-128.png, LICENSE,
+                                        MAINTAINER-README.txt,
+                                        README-INDEX.txt, README.md and
+                                        THIRD-PARTY-NOTICES.txt; the Tests
+                                        folder carries the test project; the
+                                        library project sits at the root of the
+                                        solution.
+    global.json                         selects the Microsoft.Testing.Platform
+                                        test runner; does NOT pin an SDK
+                                        version (not packed) — see TESTING
     src/CodeBrix.ServiceLocator/
       CodeBrix.ServiceLocator.csproj
       IServiceLocator.cs                the abstraction
@@ -48,6 +59,10 @@ REPOSITORY LAYOUT
       ServiceLocatorTests.cs
       ServiceLocatorImplBaseTests.cs
       ActivationExceptionTests.cs
+      NamespaceCollisionGuardTests.cs   regression guard — lives in the
+                                        unrelated namespace
+                                        CodeBrix.CollisionGuard.Tests and MUST
+                                        KEEP COMPILING; see Port modifications
     AGENT-README.txt                    consumer documentation (packed)
     MAINTAINER-README.txt               this file (not packed)
     EXTRAS-README.txt                   non-package content (not packed)
@@ -57,6 +72,11 @@ REPOSITORY LAYOUT
     THIRD-PARTY-NOTICES.txt             upstream attribution + MS-PL text
                                         (packed)
     icon-codebrix-128.png               package icon (packed)
+    AGENTS.md, CLAUDE.md, .clinerules,  the 8 AI-agent pointer files, all
+      .cursorrules, .windsurfrules,     carrying the canonical text that points
+      .github/copilot-instructions.md,  at README-INDEX.txt at the correct
+      .junie/guidelines.md,             relative depth (not packed)
+      .cursor/rules/agent-readme.mdc
 
 The source folder is flat on purpose: one namespace, no sub-folders. That is a
 deliberate exception to the usual CodeBrix "organize sources into sub-folders"
@@ -82,10 +102,21 @@ TESTING
 
   dotnet test CodeBrix.ServiceLocator.slnx
 
-Test stack: xUnit v3 + SilverAssertions, with coverlet.collector for coverage
-and xunit.runner.visualstudio for IDE discovery. No environment variables, no
-opt-in switches, no special preparation — the suite is pure in-memory unit
-tests and runs anywhere.
+Test stack: xUnit v3 + SilverAssertions, with xunit.runner.visualstudio for IDE
+discovery. There is no coverage collector in the test project. No environment
+variables, no opt-in switches, no special preparation — the suite is pure
+in-memory unit tests and runs anywhere.
+
+THE TEST RUNNER IS Microsoft.Testing.Platform, selected by global.json at the
+repository root:
+
+    { "test": { "runner": "Microsoft.Testing.Platform" } }
+
+That file does NOT pin an SDK version, so the newest installed .NET 10 SDK is
+still used; it exists solely to select the runner, and because the setting lives
+in global.json rather than in the csproj it applies to every `dotnet test` run
+anywhere in the repository, including CI. Keep the file committed — without it
+`dotnet test` falls back to the older VSTest bridge.
 
 Coverage in the suite:
 
@@ -101,6 +132,11 @@ Coverage in the suite:
     behaviour.
   * MockServiceLocator — a dictionary-backed concrete ServiceLocatorImplBase
     with a FailOnNextResolve() switch, used to drive the abstract base.
+  * NamespaceCollisionGuardTests — a compile-time regression guard rather than
+    a behaviour suite. It sits in namespace CodeBrix.CollisionGuard.Tests, an
+    unrelated `CodeBrix.*` namespace, so it stops compiling if the namespace
+    collision is ever reintroduced. Its build break is the assertion; do not
+    paper over it with a using-alias.
 
 Because ServiceLocator's provider is process-wide static state, any test that
 calls SetLocatorProvider must clear it (SetLocatorProvider(null)) so later tests
@@ -130,6 +166,10 @@ PACKAGING AND PUBLISHING
   * <PackageLicenseExpression>MS-PL</PackageLicenseExpression>, icon
     icon-codebrix-128.png, readme README.md,
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>.
+  * The library multi-targets, so the nupkg carries BOTH lib/netstandard2.0 and
+    lib/net10.0. Do not drop either: netstandard2.0 is what lets Roslyn
+    source-generator and analyzer projects take this package, and net10.0 is
+    what every modern consumer resolves to.
   * Files packed to the nupkg root: icon-codebrix-128.png, README.md,
     AGENT-README.txt, THIRD-PARTY-NOTICES.txt. MAINTAINER-README.txt,
     EXTRAS-README.txt and README-INDEX.txt are NOT packed — they describe the
